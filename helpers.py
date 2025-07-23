@@ -1,4 +1,4 @@
-from main import Card
+from card import Card
 
 
 def create_all_cards():
