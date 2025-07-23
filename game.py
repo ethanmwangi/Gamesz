@@ -54,6 +54,45 @@ class Game:
                             played_card = player.cards.pop(choice)
                             self.discard_pile.append(played_card)
                             print(f"{player.name} played: {played_card}")
+
+                            # --- Special Card Effects ---
+                            if played_card.special_ability == "skip":
+                                print("Next player is skipped!")
+                                self.next_player()  # Skip next player
+
+                            elif played_card.special_ability == "reverse":
+                                print("Play direction reversed!")
+                                self.direction *= -1
+                                # If only 2 players, reverse acts as skip
+                                if len(self.players) == 2:
+                                    self.next_player()
+
+                            elif played_card.special_ability == "+2":
+                                print("Next player draws 2 cards and is skipped!")
+                                self.next_player()
+                                next_player = self.players[self.current_player]
+                                for _ in range(2):
+                                    if self.deck:
+                                        next_player.cards.append(self.deck.pop())
+                                self.next_player()  # Skip after drawing
+
+                            elif played_card.special_ability == "+4":
+                                print("Next player draws 4 cards and is skipped!")
+                                # Wild +4: choose color
+                                new_color = input("Choose a color (red, blue, green, yellow): ").strip().lower()
+                                played_card.color = new_color
+                                self.next_player()
+                                next_player = self.players[self.current_player]
+                                for _ in range(4):
+                                    if self.deck:
+                                        next_player.cards.append(self.deck.pop())
+                                self.next_player()  # Skip after drawing
+
+                            elif played_card.special_ability == "everything" or played_card.color == "black":
+                                # Wild: choose color
+                                new_color = input("Choose a color (red, blue, green, yellow): ").strip().lower()
+                                played_card.color = new_color
+
                             break
                     print("Invalid choice. Try again.")
                 else:

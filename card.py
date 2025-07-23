@@ -5,8 +5,14 @@ class Card:
         self.special_ability = special_ability
 
     def __str__(self):
-        return f" {self.number} {self.special_ability}"
+        parts = []
+        if self.color:
+            parts.append(self.color)
+        if self .number:
+            parts.append(str(self.number))
+        if self.special_ability:
+            parts.append(self.special_ability)
+            return " ".join(parts)
 
     def __repr__(self):
-        return f"{self.number} {self.color} {self.special_ability}"
-        
+        return self.__str__()
