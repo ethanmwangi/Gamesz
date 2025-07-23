@@ -4,14 +4,10 @@ from player import Player
 from card import Card
 
 
-
-
-
-
 def generate_card_for_players():
      cards = create_all_cards()
      random.shuffle(cards)
-     return cards[0:13], cards[13:26], cards[26:39], cards[39:52]
+     return cards[0:7], cards[7:14], cards[14:21], cards[21:28]
 
 a, b, c, d = generate_card_for_players()
 player_a= Player("Player A", a)
