@@ -25,7 +25,27 @@ def shuffleDeck(deck):
           randPos = random.randint(0,107)
           deck[cardPos], deck[randPos] = deck[randPos], deck[cardPos]
      return deck
+
+#draw card fucntion
+def drawCards(numCards):
+     cardsDrawn = []
+     for x in range(numCards):
+          cardsDrawn.append(UnoDeck.pop(0))
+     return cardsDrawn
+
+def showHand(player):
+
 unoDeck = buildDeck() 
 UnoDeck = shuffleDeck(unoDeck)
 print(unoDeck)
             
+
+players = []
+numPlayers = int(input("How many players ? "))
+for players in range(numPlayers):
+    players.append(drawCards(5))
+
+print(players)
+
+playerTurn = 0
+playerDirection = 1
