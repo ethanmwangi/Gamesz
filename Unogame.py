@@ -8,6 +8,8 @@ def buildDeck():
          for value in values:
               cardVal = " {} {}".format(colour, value)
               deck.append(cardVal)
+              if value !=0:
+                    deck.append(cardVal)
    print(deck)
    return deck
 
