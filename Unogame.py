@@ -33,7 +33,13 @@ def drawCards(numCards):
           cardsDrawn.append(UnoDeck.pop(0))
      return cardsDrawn
 
-def showHand(player):
+def showHand(player, playerHand):
+     print("player {}".format(player+1))
+     print("Your Hand")
+     print("-------------------")
+     for card in playerHand:
+          print(card)
+     print("")
 
 unoDeck = buildDeck() 
 UnoDeck = shuffleDeck(unoDeck)
@@ -49,3 +55,6 @@ print(players)
 
 playerTurn = 0
 playerDirection = 1
+playing = True
+ 
+while playing:
