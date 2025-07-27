@@ -14,8 +14,8 @@ def buildDeck():
    for i in range(4):
         deck.append(wilds[0])
         deck.append(wilds[1])   
-   print(deck)
+   
    return deck
 
-buildDeck()
+unoDeck = buildDeck()
             
