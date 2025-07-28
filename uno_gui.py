@@ -6,7 +6,7 @@ def buildDeck():
     deck = []
     colours = ["Red","Green","Yellow","Blue"]
     values = [0,1,2,3,4,5,6,7,8,9,"Draw Two", "Skip", "Reverse"]
-    wilds = ["Wild","Wild Draw Four"]
+    # Only add Wild Draw Four, not regular Wild
     for colour in colours:
         for value in values:
             cardVal = f"{colour} {value}"
@@ -14,12 +14,10 @@ def buildDeck():
             if value != 0:
                 deck.append(cardVal)
     for i in range(4):
-        deck.append(wilds[0])
-        deck.append(wilds[1])
+        deck.append("Wild Draw Four")
     random.shuffle(deck)
     return deck
 
-# For button colors
 CARD_COLORS = {
     "Red": "#ff4d4d",
     "Green": "#4dff4d",
@@ -32,7 +30,7 @@ class UnoGameUI:
     def __init__(self, root):
         self.root = root
         self.root.title("UNO Game")
-        self.root.configure(bg="#222831")  # Set background color
+        self.root.configure(bg="#222831")
 
         # Ask for number of players
         self.num_players = 0
@@ -47,7 +45,7 @@ class UnoGameUI:
         self.playerTurn = 0
         self.discard = [self.deck.pop()]
         self.colours = ["Red","Green","Yellow","Blue"]
-        self.direction = 1  # 1 for clockwise, -1 for counterclockwise
+        self.direction = 1
         self.setup_ui()
         self.update_ui()
 
@@ -111,17 +109,8 @@ class UnoGameUI:
             self.players[self.playerTurn].pop(idx)
             draw_count = 4
             skip_next = True
-        elif "Wild" in card and "Draw Four" not in card:
-            color_choice = simpledialog.askstring(
-                "Wild Card", "Choose a color (Red, Green, Yellow, Blue):"
-            )
-            if color_choice is None or color_choice.capitalize() not in self.colours:
-                messagebox.showwarning("Invalid Color", "You must choose a valid color!")
-                return
-            chosen_color = color_choice.capitalize()
-            new_card = f"{chosen_color} Wild"
-            self.discard.append(new_card)
-            self.players[self.playerTurn].pop(idx)
+        # Wild logic removed
+
         elif card_color == top_color or card_val == top_val:
             self.discard.append(self.players[self.playerTurn].pop(idx))
             if card_val == "Draw Two":

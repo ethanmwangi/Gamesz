@@ -3,8 +3,7 @@ import random
 
 """
 Generate the UNO deck of 108 cards.
-Parameters: None
-Return values: deck->list
+
 """
 
 
@@ -14,7 +13,7 @@ def buildDeck():
     #example card: Red 7, Green 8, Blue Skip
     colours = ["Red","Green","Yellow","Blue"]
     values = [0,1,2,3,4,5,6,7,8,9,"Draw Two", "Skip", "Reverse"]
-    wilds = ["Wild","Wild Draw Four"]
+    wilds = ["Wild Draw Four"]
     for colour in colours:
         for value in values:
             cardVal = "{} {}".format(colour, value)
@@ -22,16 +21,15 @@ def buildDeck():
             if value != 0:
                 deck.append(cardVal)
     for i in range(4):
-        deck.append(wilds[0])
-        deck.append(wilds[1])
+        
+        deck.append("Wild Draw Four")
     return deck
 
 
 
 """
 Shuffles a list of items passed into it
-Parameters: deck->list
-Return values: deck->list
+
 """
 def shuffleDeck(deck):
     for cardPos in range(len(deck)):
@@ -39,9 +37,9 @@ def shuffleDeck(deck):
         deck[cardPos], deck[randPos] = deck[randPos], deck[cardPos]
     return deck
 
-"""Draw card function that draws a specified number of cards off the top of the deck
-Parameters: numCards -> integer
-Return: cardsDrawn -> list
+"""
+Draw card function that draws a specified number of cards off the top of the deck
+
 """
 def drawCards(numCards):
     cardsDrawn = []
@@ -51,8 +49,7 @@ def drawCards(numCards):
 
 """
 Print formatted list of player's hand
-Parameter: player->integer, playerHand->list
-Return: None
+
 """
 def showHand(player, playerHand):
     print("Player {}'s Turn".format(player+1))
@@ -66,8 +63,7 @@ def showHand(player, playerHand):
 
 """
 Check whether a player is able to play a card, or not
-Parameters: colour->string, value->string, playerHand->list
-Return: boolean
+
 """
 def canPlay(colour, value, playerHand):
     for card in playerHand:
