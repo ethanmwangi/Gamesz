@@ -7,6 +7,8 @@ Parameters: None
 Return values: deck->list
 """
 
+
+
 def buildDeck():
     deck = []
     #example card: Red 7, Green 8, Blue Skip
@@ -23,6 +25,8 @@ def buildDeck():
         deck.append(wilds[0])
         deck.append(wilds[1])
     return deck
+
+
 
 """
 Shuffles a list of items passed into it
