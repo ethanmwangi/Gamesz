@@ -41,13 +41,21 @@ def showHand(player, playerHand):
           print(card)
      print("")
 
+def canPlay(discarCard, playerHand):
+     splitCard = discarCard.split('',-1)
+     colour = splitCard[0]
+     cardVallue = splitCard[1]
+
 unoDeck = buildDeck() 
 UnoDeck = shuffleDeck(unoDeck)
+discards = []
 print(unoDeck)
             
 
 players = []
 numPlayers = int(input("How many players ? "))
+while numPlayers < 2 or numPlayers > 4:
+     numPlayers = int(input("Invalid number of players. Please enter a number between 2 and 4: "))
 for players in range(numPlayers):
     players.append(drawCards(5))
 
@@ -56,5 +64,9 @@ print(players)
 playerTurn = 0
 playerDirection = 1
 playing = True
+discards.append(UnoDeck.pop(0))  # Draw the first card to start the game
  
 while playing:
+     showHand(playerTurn, players[playerTurn])
+     print("Card on top of discard pile : {}" .format(discards[-1]))
+
