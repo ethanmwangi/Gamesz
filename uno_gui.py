@@ -83,20 +83,36 @@ class UnoGameUI:
             btn.pack(side=tk.LEFT, padx=4, pady=4)
 
     def play_card(self, idx):
-        card = self.players[self.playerTurn][idx]
-        top_card = self.discard[-1]
-        card_color, card_val = card.split(" ", 1)
-        top_color, top_val = top_card.split(" ", 1)
-        if "Wild" in card or card_color == top_color or card_val == top_val:
-            self.discard.append(self.players[self.playerTurn].pop(idx))
-            if len(self.players[self.playerTurn]) == 0:
-                messagebox.showinfo("UNO", f"Player {self.playerTurn+1} wins!")
-                self.root.quit()
-                return
-            self.playerTurn = (self.playerTurn + 1) % self.num_players
-            self.update_ui()
-        else:
-            messagebox.showwarning("Invalid Move", "You can't play that card!")
+      card = self.players[self.playerTurn][idx]
+      top_card = self.discard[-1]
+      card_color, card_val = card.split(" ", 1)
+      top_color, top_val = top_card.split(" ", 1)
+      if "Wild" in card:
+        # Prompt for color choice
+        color_choice = simpledialog.askstring(
+            "Wild Card", "Choose a color (Red, Green, Yellow, Blue):"
+        )
+        if color_choice is None or color_choice.capitalize() not in self.colours:
+            messagebox.showwarning("Invalid Color", "You must choose a valid color!")
+            return
+        # Set the discard to the chosen color and wild type
+        chosen_color = color_choice.capitalize()
+        new_card = f"{chosen_color} {card_val}"
+        self.discard.append(new_card)
+        self.players[self.playerTurn].pop(idx)
+      elif card_color == top_color or card_val == top_val:
+        self.discard.append(self.players[self.playerTurn].pop(idx))
+      else:
+        messagebox.showwarning("Invalid Move", "You can't play that card!")
+        return
+
+      if len(self.players[self.playerTurn]) == 0:
+        messagebox.showinfo("UNO", f"Player {self.playerTurn+1} wins!")
+        self.root.quit()
+        return
+      self.playerTurn = (self.playerTurn + 1) % self.num_players
+      self.update_ui()
+        
 
     def draw_card(self):
         if self.deck:
