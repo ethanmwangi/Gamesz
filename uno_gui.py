@@ -83,35 +83,64 @@ class UnoGameUI:
             btn.pack(side=tk.LEFT, padx=4, pady=4)
 
     def play_card(self, idx):
-      card = self.players[self.playerTurn][idx]
-      top_card = self.discard[-1]
-      card_color, card_val = card.split(" ", 1)
-      top_color, top_val = top_card.split(" ", 1)
-      if "Wild" in card:
+     card = self.players[self.playerTurn][idx]
+     top_card = self.discard[-1]
+     card_color, card_val = card.split(" ", 1)
+     top_color, top_val = top_card.split(" ", 1)
+     skip_next = False
+     draw_count = 0
+
+     if "Wild Draw Four" in card:
         # Prompt for color choice
+        color_choice = simpledialog.askstring(
+            "Wild Draw Four", "Choose a color (Red, Green, Yellow, Blue):"
+        )
+        if color_choice is None or color_choice.capitalize() not in self.colours:
+            messagebox.showwarning("Invalid Color", "You must choose a valid color!")
+            return
+        chosen_color = color_choice.capitalize()
+        new_card = f"{chosen_color} Wild Draw Four"
+        self.discard.append(new_card)
+        self.players[self.playerTurn].pop(idx)
+        draw_count = 4
+        skip_next = True
+     elif "Wild" in card:
         color_choice = simpledialog.askstring(
             "Wild Card", "Choose a color (Red, Green, Yellow, Blue):"
         )
         if color_choice is None or color_choice.capitalize() not in self.colours:
             messagebox.showwarning("Invalid Color", "You must choose a valid color!")
             return
-        # Set the discard to the chosen color and wild type
         chosen_color = color_choice.capitalize()
-        new_card = f"{chosen_color} {card_val}"
+        new_card = f"{chosen_color} Wild"
         self.discard.append(new_card)
         self.players[self.playerTurn].pop(idx)
-      elif card_color == top_color or card_val == top_val:
+     elif card_color == top_color or card_val == top_val:
         self.discard.append(self.players[self.playerTurn].pop(idx))
-      else:
+        if card_val == "Draw Two":
+            draw_count = 2
+            skip_next = True
+     else:
         messagebox.showwarning("Invalid Move", "You can't play that card!")
         return
 
-      if len(self.players[self.playerTurn]) == 0:
+     if len(self.players[self.playerTurn]) == 0:
         messagebox.showinfo("UNO", f"Player {self.playerTurn+1} wins!")
         self.root.quit()
         return
-      self.playerTurn = (self.playerTurn + 1) % self.num_players
-      self.update_ui()
+
+    # Handle drawing and skipping for Draw Two and Wild Draw Four
+     if skip_next:
+        next_player = (self.playerTurn + 1) % self.num_players
+        for _ in range(draw_count):
+            if self.deck:
+                self.players[next_player].append(self.deck.pop())
+        # Skip the next player's turn
+        self.playerTurn = (self.playerTurn + 2) % self.num_players
+     else:
+        self.playerTurn = (self.playerTurn + 1) % self.num_players
+
+     self.update_ui()
         
 
     def draw_card(self):
