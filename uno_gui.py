@@ -47,6 +47,7 @@ class UnoGameUI:
         self.playerTurn = 0
         self.discard = [self.deck.pop()]
         self.colours = ["Red","Green","Yellow","Blue"]
+        self.direction = 1  # 1 for clockwise, -1 for counterclockwise
         self.setup_ui()
         self.update_ui()
 
@@ -71,6 +72,8 @@ class UnoGameUI:
         self.discard_label.config(text=f"Top of Discard: {self.discard[-1]}")
         self.info_label.config(text=f"Player {self.playerTurn+1}'s turn")
         hand = self.players[self.playerTurn]
+        row = 0
+        col = 0
         for idx, card in enumerate(hand):
             card_color = card.split(" ", 1)[0]
             btn_color = CARD_COLORS.get(card_color, "#cccccc")
@@ -80,73 +83,86 @@ class UnoGameUI:
                 bg=btn_color, fg="#222831" if card_color != "Yellow" else "#222831",
                 command=lambda i=idx: self.play_card(i)
             )
-            btn.pack(side=tk.LEFT, padx=4, pady=4)
+            btn.grid(row=row, column=col, padx=4, pady=4)
+            col += 1
+            if col >= 7:
+                col = 0
+                row += 1
 
     def play_card(self, idx):
-     card = self.players[self.playerTurn][idx]
-     top_card = self.discard[-1]
-     card_color, card_val = card.split(" ", 1)
-     top_color, top_val = top_card.split(" ", 1)
-     skip_next = False
-     draw_count = 0
+        card = self.players[self.playerTurn][idx]
+        top_card = self.discard[-1]
+        card_color, card_val = card.split(" ", 1)
+        top_color, top_val = top_card.split(" ", 1)
+        skip_next = False
+        draw_count = 0
+        reverse = False
 
-     if "Wild Draw Four" in card:
-        # Prompt for color choice
-        color_choice = simpledialog.askstring(
-            "Wild Draw Four", "Choose a color (Red, Green, Yellow, Blue):"
-        )
-        if color_choice is None or color_choice.capitalize() not in self.colours:
-            messagebox.showwarning("Invalid Color", "You must choose a valid color!")
-            return
-        chosen_color = color_choice.capitalize()
-        new_card = f"{chosen_color} Wild Draw Four"
-        self.discard.append(new_card)
-        self.players[self.playerTurn].pop(idx)
-        draw_count = 4
-        skip_next = True
-     elif "Wild" in card:
-        color_choice = simpledialog.askstring(
-            "Wild Card", "Choose a color (Red, Green, Yellow, Blue):"
-        )
-        if color_choice is None or color_choice.capitalize() not in self.colours:
-            messagebox.showwarning("Invalid Color", "You must choose a valid color!")
-            return
-        chosen_color = color_choice.capitalize()
-        new_card = f"{chosen_color} Wild"
-        self.discard.append(new_card)
-        self.players[self.playerTurn].pop(idx)
-     elif card_color == top_color or card_val == top_val:
-        self.discard.append(self.players[self.playerTurn].pop(idx))
-        if card_val == "Draw Two":
-            draw_count = 2
+        if "Wild Draw Four" in card:
+            color_choice = simpledialog.askstring(
+                "Wild Draw Four", "Choose a color (Red, Green, Yellow, Blue):"
+            )
+            if color_choice is None or color_choice.capitalize() not in self.colours:
+                messagebox.showwarning("Invalid Color", "You must choose a valid color!")
+                return
+            chosen_color = color_choice.capitalize()
+            new_card = f"{chosen_color} Wild Draw Four"
+            self.discard.append(new_card)
+            self.players[self.playerTurn].pop(idx)
+            draw_count = 4
             skip_next = True
-     else:
-        messagebox.showwarning("Invalid Move", "You can't play that card!")
-        return
+        elif "Wild" in card and "Draw Four" not in card:
+            color_choice = simpledialog.askstring(
+                "Wild Card", "Choose a color (Red, Green, Yellow, Blue):"
+            )
+            if color_choice is None or color_choice.capitalize() not in self.colours:
+                messagebox.showwarning("Invalid Color", "You must choose a valid color!")
+                return
+            chosen_color = color_choice.capitalize()
+            new_card = f"{chosen_color} Wild"
+            self.discard.append(new_card)
+            self.players[self.playerTurn].pop(idx)
+        elif card_color == top_color or card_val == top_val:
+            self.discard.append(self.players[self.playerTurn].pop(idx))
+            if card_val == "Draw Two":
+                draw_count = 2
+                skip_next = True
+            elif card_val == "Skip":
+                skip_next = True
+            elif card_val == "Reverse":
+                if self.num_players == 2:
+                    skip_next = True  # In 2-player, Reverse acts as Skip
+                else:
+                    self.direction *= -1
+                    self.playerTurn = (self.playerTurn + self.direction) % self.num_players
+                    self.update_ui()
+                    return
+        else:
+            messagebox.showwarning("Invalid Move", "You can't play that card!")
+            return
 
-     if len(self.players[self.playerTurn]) == 0:
-        messagebox.showinfo("UNO", f"Player {self.playerTurn+1} wins!")
-        self.root.quit()
-        return
+        if len(self.players[self.playerTurn]) == 0:
+            messagebox.showinfo("UNO", f"Player {self.playerTurn+1} wins!")
+            self.root.quit()
+            return
 
-    # Handle drawing and skipping for Draw Two and Wild Draw Four
-     if skip_next:
-        next_player = (self.playerTurn + 1) % self.num_players
-        for _ in range(draw_count):
-            if self.deck:
-                self.players[next_player].append(self.deck.pop())
-        # Skip the next player's turn
-        self.playerTurn = (self.playerTurn + 2) % self.num_players
-     else:
-        self.playerTurn = (self.playerTurn + 1) % self.num_players
+        # Handle drawing and skipping for Draw Two, Wild Draw Four, Skip, and Reverse
+        if skip_next:
+            next_player = (self.playerTurn + self.direction) % self.num_players
+            for _ in range(draw_count):
+                if self.deck:
+                    self.players[next_player].append(self.deck.pop())
+            # Skip the next player's turn
+            self.playerTurn = (self.playerTurn + 2 * self.direction) % self.num_players
+        else:
+            self.playerTurn = (self.playerTurn + self.direction) % self.num_players
 
-     self.update_ui()
-        
+        self.update_ui()
 
     def draw_card(self):
         if self.deck:
             self.players[self.playerTurn].append(self.deck.pop())
-            self.playerTurn = (self.playerTurn + 1) % self.num_players
+            self.playerTurn = (self.playerTurn + self.direction) % self.num_players
             self.update_ui()
         else:
             messagebox.showinfo("Deck Empty", "No more cards to draw!")
